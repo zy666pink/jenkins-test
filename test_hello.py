@@ -5,4 +5,5 @@ def test_say_hello():
 if __name__ == "__main__":
     test_say_hello()
     print("✅ 单元测试全部通过！")
-测试自动触发成功2
+        print("✅ 单元测试全部通过！")
+    print("测试自动触发成功2")

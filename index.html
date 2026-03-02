@@ -1,12 +1,42 @@
-vim index.html
-# 2. 按 i 进入编辑模式，修改内容为：
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>测试页面 v2</title>  <!-- 新增版本标识 -->
+    <title>欢迎访问我的站点</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .welcome {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello GitHub! v2版本</h1>  <!-- 修改内容 -->
-    <p>这是v2版本，新增了一行测试文字</p>  <!-- 新增内容 -->
+    <div class="welcome">
+        <h1>👋 欢迎来到我的服务器</h1>
+        <p>这是一个自定义的 Nginx 页面，由 Docker 容器提供服务。</p>
+        <p>当前时间：<span id="time"></span></p>
+    </div>
+    <script>
+        document.getElementById('time').innerText = new Date().toLocaleString('zh-CN');
+    </script>
 </body>
 </html>

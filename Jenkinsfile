@@ -47,6 +47,7 @@ pipeline {
 
                     def indexExists = fileExists 'index.html'
                     if (!indexExists) {
+
                         error("❌ 关键文件缺失：仓库里没有index.html，镜像内容为空！")
                     }
                     echo "✅ index.html 存在"

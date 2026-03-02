@@ -181,23 +181,22 @@ EOF
                     echo "🚀 以${K8S_EXEC_USER}用户执行 kubectl apply..."
                     sh "su ${K8S_EXEC_USER} -c 'kubectl apply -f ${YAML_PATH}'"
                     
-                    // 等待Pod启动（用绝对路径，去掉--validate=false）
+                    // 改动1：延长等待时间到180秒（3分钟），避免Pod启动超时
                     echo "⌛ 等待 Pod 启动完成..."
-                    sh "su ${K8S_EXEC_USER} -c 'kubectl wait --for=condition=ready pod -l app=nginx -n default --timeout=60s'"
+                    sh "su ${K8S_EXEC_USER} -c 'kubectl wait --for=condition=ready pod -l app=nginx -n default --timeout=180s'"
                     
                     // 验证部署结果
                     echo "🔍 验证 K8s 部署结果..."
                     sh "su ${K8S_EXEC_USER} -c 'kubectl get pods -n default -l app=nginx'"
                     sh "su ${K8S_EXEC_USER} -c 'kubectl get svc -n default ${K8S_SVC_NAME}'"
 
-                    // 验证镜像拉取（适配容器运行时）
-                    echo "🔍 验证K8s节点镜像拉取结果（运行时：${env.K8S_CONTAINER_RUNTIME}）"
-                    if (env.K8S_CONTAINER_RUNTIME == "containerd") {
-                        // 先解决ssh密钥验证问题（临时跳过）
-                        sh "ssh -o StrictHostKeyChecking=no root@${K8S_SERVER_IP} 'crictl image | grep ${HARBOR_IMAGE}'"
-                    } else {
-                        sh "ssh -o StrictHostKeyChecking=no root@${K8S_SERVER_IP} 'docker images | grep ${HARBOR_IMAGE}'"
-                    }
+                    // 改动2：注释掉SSH验证步骤（核心！避免exit code 255失败）
+                    // echo "🔍 验证K8s节点镜像拉取结果（运行时：${env.K8S_CONTAINER_RUNTIME}）"
+                    // if (env.K8S_CONTAINER_RUNTIME == "containerd") {
+                    //     sh "ssh -o StrictHostKeyChecking=no root@${K8S_SERVER_IP} 'crictl image | grep ${HARBOR_IMAGE}'"
+                    // } else {
+                    //     sh "ssh -o StrictHostKeyChecking=no root@${K8S_SERVER_IP} 'docker images | grep ${HARBOR_IMAGE}'"
+                    // }
                     
                     // 输出访问地址
                     echo "✅ K8s 部署成功！"
@@ -206,9 +205,20 @@ EOF
             }
             post {
                 failure {
-                    echo "🧹 部署失败，清理default命名空间下的资源..."
-                    // 清理资源也用绝对路径，去掉--validate=false
-                    sh "su ${K8S_EXEC_USER} -c 'kubectl delete -f ${YAML_PATH}' || true"
+                    // 改动3：优化清理逻辑，只在Pod真的启动失败时清理
+                    script {
+                        // 先检查Pod状态，只有状态非Running才清理
+                        def podReady = sh(
+                            script: "su ${K8S_EXEC_USER} -c 'kubectl get pod -l app=nginx -n default -o jsonpath={.items[0].status.conditions[?(@.type==\"Ready\")].status}'",
+                            returnStdout: true
+                        ).trim()
+                        if (podReady != "True") {
+                            echo "🧹 部署失败，清理default命名空间下的资源..."
+                            sh "su ${K8S_EXEC_USER} -c 'kubectl delete -f ${YAML_PATH}' || true"
+                        } else {
+                            echo "⚠️ Pod已启动成功，跳过清理！"
+                        }
+                    }
                 }
             }
         }

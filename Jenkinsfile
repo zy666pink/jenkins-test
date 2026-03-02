@@ -58,7 +58,7 @@ pipeline {
                     echo "✅ index.html 存在"
 
                     // 可选：检查脚本是否可执行（比如test_hello.sh）
-                    if (fileExists 'test_hello.sh') {
+                    if (fileExists('test_hello.sh')) {
                         sh "chmod +x test_hello.sh" // 加执行权限
                         echo "✅ 测试脚本已赋权"
                     }

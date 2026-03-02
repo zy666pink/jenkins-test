@@ -13,7 +13,7 @@ pipeline {
         K8S_SERVER_IP   = "${params.K8S_SERVER_IP}"
         K8S_DEPLOY_NAME = "nginx-deploy"
         K8S_SVC_NAME    = "nginx-svc"
-        NODE_PORT       = "30080"
+        NODE_PORT       = "30081"
         K8S_EXEC_USER   = "${params.K8S_EXEC_USER}"
         // 新增：指定yaml绝对路径，避免切换用户后找不到
         YAML_PATH       = "/var/jenkins_home/workspace/jenkins-github-k8s/nginx-k8s.yaml"

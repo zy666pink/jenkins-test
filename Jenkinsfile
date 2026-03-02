@@ -91,7 +91,8 @@ pipeline {
                     usernameVariable: 'HARBOR_USER'
                 )]) {
                     sh "docker tag ${LOCAL_IMAGE} ${HARBOR_IMAGE}"
-                    sh "echo ${HARBOR_PD} | docker login ${HARBOR_IP} -u ${HARBOR_USER} --password-stdin"
+                    sh 'echo $HARBOR_PD | docker login $HARBOR_IP -u $HARBOR_USER --password-stdin'
+
                     sh "docker push ${HARBOR_IMAGE}"
                     sh "docker logout ${HARBOR_IP}"
                     echo "✅ 镜像推送成功: ${HARBOR_IMAGE}"

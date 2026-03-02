@@ -114,7 +114,7 @@ pipeline {
                     sh "sleep 3"
                     sh "docker ps --filter name=${CONTAINER_NAME}"
                     // 替换为参数化IP，修复语法报错
-                    echo "✅ 容器部署成功，访问地址: http://${JENKINS_IP}:${DEPLOY_PORT%:*}"
+                    echo "✅ 容器部署成功，访问地址: http://${JENKINS_IP}:${DEPLOY_PORT}"
                 }
             }
             post {
@@ -140,7 +140,7 @@ pipeline {
             echo "✅ 流水线大成功！"
             echo "📦 镜像地址: ${HARBOR_IMAGE}"
             // 替换为参数化IP
-            echo "🌐 访问地址: http://${JENKINS_IP}:${DEPLOY_PORT%:*}"
+            echo "🌐 访问地址: http://${JENKINS_IP}:${DEPLOY_PORT}"
         }
     }
 }
